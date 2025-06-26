@@ -1,19 +1,35 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Maqola
+from .forms import MaqolaForm  # ← Formani chaqiramiz
 from docx import Document
 from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-# Create your views here.
 
+# Bosh sahifa
 def home(request):
     return render(request, 'home.html')
 
+
+# Maqolalar ro‘yxati
 def list_maqola(request):
     maqolalar = Maqola.objects.all().order_by('number')
     return render(request, 'maqola_list.html', {'maqolalar': maqolalar})
 
-# Word faylga eksport qilish
+
+# Maqola qo‘shish — FORM orqali
+def create_maqola(request):
+    if request.method == 'POST':
+        form = MaqolaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('maqola_list')
+    else:
+        form = MaqolaForm()
+    return render(request, 'maqola_form.html', {'form': form})
+
+
+# Word faylga eksport
 def export_maqola_docx(request):
     maqolalar = Maqola.objects.all().order_by('-id')
     doc = Document()
@@ -31,7 +47,6 @@ def export_maqola_docx(request):
         run.bold = True
         run.font.size = Pt(12)
 
-    # Jadval
     table = doc.add_table(rows=1, cols=6)
     table.style = 'Table Grid'
     headers = [
