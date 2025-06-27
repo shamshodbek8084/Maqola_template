@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import Maqola
-from .forms import MaqolaForm 
+from .forms import MaqolaForm
 from docx import Document
-from docx.shared import Pt
+from docx.shared import Pt, Inches
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.section import WD_ORIENT
+from apps.accounts.models import Profile
 
 
 def home(request):
@@ -26,7 +28,7 @@ def create_maqola(request):
 
 
 def list_maqola(request):
-    maqolalar = Maqola.objects.filter(user=request.user).order_by('number')
+    maqolalar = Maqola.objects.filter(user=request.user).order_by('id')
     return render(request, 'maqola/list.html', {'maqolalar': maqolalar})
 
 
@@ -47,17 +49,28 @@ def delete_maqola(request, pk):
     return render(request, 'maqola/delete.html', {'maqola': maqola})
 
 
-# === EXPORT to DOCX ===
 def export_maqola_docx(request):
-    maqolalar = Maqola.objects.all().order_by('-id')
-    doc = Document()
-    last = maqolalar.first()
+    user = request.user
+    maqolalar = Maqola.objects.filter(user=user).order_by('id')
+    profile = Profile.objects.get(user=user)
 
+    doc = Document()
+
+    # LANDSCAPE format va sahifa chetlarini sozlash
+    section = doc.sections[-1]
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.page_width, section.page_height = section.page_height, section.page_width
+    section.left_margin = Inches(1)
+    section.right_margin = Inches(1)
+    section.top_margin = Inches(1)
+    section.bottom_margin = Inches(1)
+
+    # Sarlavha
     heading_text = (
         "Muhammad al-Xorazmiy nomidagi Toshkent axborot texnologiyalari universiteti Kiberxavfsizlik fakulteti\n"
-        f"{last.fakultet_raqami} - \u201c{last.fakultet} (Axborot-kommunikatsiya texnologiyalari va servis)\u201d "
-        f"{last.guruh_raqami}-guruh talabasi {last.talaba_fish}ning\n"
-        "ILMIY ISHLARI RO\u2018YXATI"
+        f"{profile.fakultet_raqami} – “{profile.fakultet} (Axborot-kommunikatsiya texnologiyalari va servis)” "
+        f"ta’lim yo‘nalishi {profile.guruh_raqami}-guruh talabasi {profile.talaba_fish}ning\n"
+        "ILMIY ISHLARI RO‘YXATI"
     )
     heading = doc.add_paragraph(heading_text)
     heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
@@ -65,25 +78,43 @@ def export_maqola_docx(request):
         run.bold = True
         run.font.size = Pt(12)
 
+    # Jadval
     table = doc.add_table(rows=1, cols=6)
     table.style = 'Table Grid'
-    headers = ["\u2116", "Ilmiy ishning nomi", "Format", "Jurnal ma’lumotlari", "Bosma bet/muallif", "Mualliflar"]
+    table.autofit = False
+
+    column_widths = [Inches(0.5), Inches(2.0), Inches(1.2), Inches(2.5), Inches(1.2), Inches(1.6)]
+
+    headers = [
+        "№",
+        "Ilmiy ishning nomi",
+        "Bosma, qo‘lyozma yoki elektron",
+        "Jurnal, to‘plam (vil., nomer, betlar), nashriyot yoki mualliflik guvohnomasi nomeri",
+        "Bosma taboq yoki betlar soni, mualliflik ishtiroki",
+        "Hammualliflarning familiyalari, ismlari, otalarining ismlari"
+    ]
+
     hdr_cells = table.rows[0].cells
     for i, header in enumerate(headers):
         p = hdr_cells[i].paragraphs[0]
         run = p.add_run(header)
         run.bold = True
         run.font.size = Pt(10)
+        hdr_cells[i].width = column_widths[i]
 
-    for m in maqolalar:
+    for idx, m in enumerate(maqolalar, start=1):
         row_cells = table.add_row().cells
-        row_cells[0].text = str(m.number)
+        row_cells[0].text = str(idx)
         row_cells[1].text = m.title
         row_cells[2].text = m.format
         row_cells[3].text = m.journal_information
         row_cells[4].text = m.piece
         row_cells[5].text = m.authors
 
+        for i, width in enumerate(column_widths):
+            row_cells[i].width = width
+
+    # Export to DOCX
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     )

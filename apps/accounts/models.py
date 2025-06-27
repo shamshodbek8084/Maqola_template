@@ -1,17 +1,19 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
+from django.conf import settings
 
 
 # Create your models here.
 
 
 class Profile(models.Model):
-    icon = models.ImageField(upload_to='pictures/', null=True, blank=True)
+
+    talaba_fish = models.CharField(max_length=256)
+    fakultet = models.TextField(max_length=256)
+    fakultet_raqami = models.PositiveIntegerField()
+    guruh_raqami = models.CharField(max_length=256)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    phone_number = models.CharField(max_length=11, null=True, blank=True)
-    address = models.CharField(max_length=256, null=True, blank=True)
-    country = models.CharField(max_length=256, null=True, blank=True)
-    birth = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return self.user.username
+    

@@ -36,12 +36,10 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'icon',
-            'user',
-            'phone_number',
-            'address',
-            'country',
-            'birth',
+            'talaba_fish', 
+            'fakultet', 
+            'fakultet_raqami', 
+            'guruh_raqami',
         ]
 
 
@@ -63,3 +61,4 @@ class LoginForm(forms.Form):
 
     def get_user(self):
         return getattr(self, 'user', None)
+

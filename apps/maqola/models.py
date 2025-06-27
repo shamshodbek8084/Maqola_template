@@ -1,21 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+
 
 class Maqola(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    talaba_fish = models.CharField(max_length=256)
-    fakultet = models.TextField(max_length=256)
-    fakultet_raqami = models.PositiveIntegerField()
-    guruh_raqami = models.CharField(max_length=256)
-
     STATUS_MAQOLA = (
         ('Elektron', 'Elektron'),
         ('Bosma', 'Bosma'),
         ('Qo`l yozma', 'Qo`l yozma'),
     )
 
-    number = models.PositiveIntegerField()
     title = models.CharField(max_length=256)
     format = models.CharField(max_length=56, choices=STATUS_MAQOLA, default='Elektron')
 

@@ -15,6 +15,8 @@ def register_view(request):
             user.set_password(user_form.cleaned_data['password'])
             user.save()
 
+            login(request, user)
+
             profile = profile_form.save(commit=False)
             profile.user = user
             profile.save()
