@@ -30,6 +30,10 @@ def register_view(request):
         'profile_form' : profile_form
     })
 
+
+def profile_view(request):
+    return render(request, 'profile.html')
+
 def login_view(request):
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
