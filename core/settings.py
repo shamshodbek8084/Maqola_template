@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'maqola',
+    'apps.maqola',
+    'apps.accounts',
 ]
 
 MIDDLEWARE = [

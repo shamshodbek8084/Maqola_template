@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Maqola
-from .forms import MaqolaForm  # ← Formani chaqiramiz
+from .forms import MaqolaForm 
 from docx import Document
 from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
