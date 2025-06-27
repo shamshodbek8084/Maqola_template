@@ -1,14 +1,13 @@
 from django.db import models
-
-# Create your models here.
+from django.contrib.auth.models import User
 
 class Maqola(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     talaba_fish = models.CharField(max_length=256)
     fakultet = models.TextField(max_length=256)
     fakultet_raqami = models.PositiveIntegerField()
     guruh_raqami = models.CharField(max_length=256)
-    
 
     STATUS_MAQOLA = (
         ('Elektron', 'Elektron'),
@@ -29,24 +28,22 @@ class Maqola(models.Model):
 
     bet_soni = models.PositiveIntegerField()
     mualliflar_soni = models.PositiveIntegerField()
-
-    piece = models.CharField(max_length=256)
+    piece = models.CharField(max_length=256, blank=True)
 
     authors = models.CharField(max_length=512)
 
     def __str__(self):
-        return f"{self.number}. {self.title}"
-    
+        return f"{self.title} - {self.user.username}"
+
     @property
     def journal_information(self):
-        return f'{self.publication_type} of collection, "{self.journal_name}", Volume - {self.volume}, Issue - {self.issue}, {self.published_date}, -B. {self.pages}'
-    
+        return (
+            f'{self.publication_type} of collection, "{self.journal_name}", '
+            f'Volume - {self.volume}, Issue - {self.issue}, '
+            f'{self.published_date.strftime("%Y-%m-%d")}, -B. {self.pages}'
+        )
+
     def save(self, *args, **kwargs):
         if self.bet_soni and self.mualliflar_soni:
             self.piece = f"{self.bet_soni}/{self.mualliflar_soni}"
         super().save(*args, **kwargs)
-
-
-
-
-

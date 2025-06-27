@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Ro‘yxatdan o‘tish</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .errorlist {
+            color: red;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📝 Ro‘yxatdan o‘tish</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>👤 Asosiy ma’lumotlar</h3>
+        {{ user_form.username.label_tag }}<br>
+        {{ user_form.username }}<br><br>
+
+        {{ user_form.email.label_tag }}<br>
+        {{ user_form.email }}<br><br>
+
+        <div class="password-container">
+            {{ user_form.password.label_tag }}<br>
+            {{ user_form.password }}
+            <span class="toggle-eye" onclick="togglePassword('id_password', this)">👁️</span>
+        </div><br>
+
+        <div class="password-container">
+            {{ user_form.password2.label_tag }}<br>
+            {{ user_form.password2 }}
+            <span class="toggle-eye" onclick="togglePassword('id_password2', this)">👁️</span>
+        </div><br>
+
+        <h3>📄 Profil ma’lumotlari</h3>
+        {{ profile_form.as_p }}
+
+        <button type="submit">Ro‘yxatdan o‘tish</button>
+    </form>
+
+    <p style="text-align:center; margin-top: 20px;">
+        <a href="{% url 'accounts:login' %}">🔐 Allaqachon hisobingiz bormi? Kirish</a>
+    </p>
+
+    <script>
+        function togglePassword(fieldId, eyeIcon) {
+            const field = document.getElementById(fieldId);
+            if (field.type === "password") {
+                field.type = "text";
+                eyeIcon.textContent = "🙈";
+            } else {
+                field.type = "password";
+                eyeIcon.textContent = "👁️";
+            }
+        }
+    </script>
+
+</body>
+</html>

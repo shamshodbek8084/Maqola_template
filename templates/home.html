@@ -3,9 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Bosh sahifa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .emoji {
+            margin-right: 8px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Assalomu alaykum!</h1>
-    <p><a href="{% url 'maqola_list' %}">Maqolalar ro‘yxatini ko‘rish</a></p>
+
+<div class="container">
+    <h2>🏠 Bosh sahifaga xush kelibsiz</h2>
+
+    <a href="{% url 'accounts:register' %}" class="btn">📝 Ro‘yxatdan o‘tish</a>
+    <a href="{% url 'accounts:login' %}" class="btn">🔐 Kirish</a>
+</div>
+
 </body>
 </html>

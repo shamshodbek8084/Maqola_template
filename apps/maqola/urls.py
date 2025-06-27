@@ -1,9 +1,13 @@
+# maqola/urls.py
 from django.urls import path
-from .views import home, list_maqola, export_maqola_docx, create_maqola
+from .views import create_maqola, list_maqola, update_maqola, delete_maqola, export_maqola_docx
+
+app_name = 'maqola'  # namespace
 
 urlpatterns = [
-    path('', home, name='home'),
-    path('maqolalar/', list_maqola, name='maqola_list'),
-    path('maqolalar/export/', export_maqola_docx, name='export_maqola_docx'),
-    path('maqolalar/create/', create_maqola, name='maqola_create'),
+    path('create/', create_maqola, name='create'),
+    path('list/', list_maqola, name='list'),
+    path('update/<int:pk>/', update_maqola, name='update'),
+    path('delete/<int:pk>/', delete_maqola, name='delete'),
+    path('export/', export_maqola_docx, name='export'),
 ]

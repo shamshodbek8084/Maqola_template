@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import Maqola
 from .forms import MaqolaForm 
@@ -6,30 +6,48 @@ from docx import Document
 from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
-# Bosh sahifa
+
 def home(request):
     return render(request, 'home.html')
 
 
-# Maqolalar ro‘yxati
-def list_maqola(request):
-    maqolalar = Maqola.objects.all().order_by('number')
-    return render(request, 'maqola_list.html', {'maqolalar': maqolalar})
-
-
-# Maqola qo‘shish — FORM orqali
 def create_maqola(request):
     if request.method == 'POST':
         form = MaqolaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('maqola_list')
+            maqola = form.save(commit=False)
+            maqola.user = request.user  # shu foydalanuvchiga biriktiramiz
+            maqola.save()
+            return redirect('maqola:list')
     else:
         form = MaqolaForm()
-    return render(request, 'maqola_form.html', {'form': form})
+    return render(request, 'maqola/create.html', {'form': form})
 
 
-# Word faylga eksport
+
+def list_maqola(request):
+    maqolalar = Maqola.objects.filter(user=request.user).order_by('number')
+    return render(request, 'maqola/list.html', {'maqolalar': maqolalar})
+
+
+def update_maqola(request, pk):
+    maqola = get_object_or_404(Maqola, pk=pk, user=request.user)
+    form = MaqolaForm(request.POST or None, instance=maqola)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('maqola:list')
+    return render(request, 'maqola/update.html', {'form': form})
+
+
+def delete_maqola(request, pk):
+    maqola = get_object_or_404(Maqola, pk=pk, user=request.user)
+    if request.method == 'POST':
+        maqola.delete()
+        return redirect('maqola:list')
+    return render(request, 'maqola/delete.html', {'maqola': maqola})
+
+
+# === EXPORT to DOCX ===
 def export_maqola_docx(request):
     maqolalar = Maqola.objects.all().order_by('-id')
     doc = Document()
@@ -37,9 +55,9 @@ def export_maqola_docx(request):
 
     heading_text = (
         "Muhammad al-Xorazmiy nomidagi Toshkent axborot texnologiyalari universiteti Kiberxavfsizlik fakulteti\n"
-        f"{last.fakultet_raqami} - “{last.fakultet} (Axborot-kommunikatsiya texnologiyalari va servis)” "
+        f"{last.fakultet_raqami} - \u201c{last.fakultet} (Axborot-kommunikatsiya texnologiyalari va servis)\u201d "
         f"{last.guruh_raqami}-guruh talabasi {last.talaba_fish}ning\n"
-        "ILMIY ISHLARI RO‘YXATI"
+        "ILMIY ISHLARI RO\u2018YXATI"
     )
     heading = doc.add_paragraph(heading_text)
     heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
@@ -49,14 +67,7 @@ def export_maqola_docx(request):
 
     table = doc.add_table(rows=1, cols=6)
     table.style = 'Table Grid'
-    headers = [
-        "№",
-        "Ilmiy ishning nomi",
-        "Format",
-        "Jurnal ma’lumotlari",
-        "Bosma bet/muallif",
-        "Mualliflar"
-    ]
+    headers = ["\u2116", "Ilmiy ishning nomi", "Format", "Jurnal ma’lumotlari", "Bosma bet/muallif", "Mualliflar"]
     hdr_cells = table.rows[0].cells
     for i, header in enumerate(headers):
         p = hdr_cells[i].paragraphs[0]

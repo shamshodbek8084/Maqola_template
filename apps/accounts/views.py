@@ -19,7 +19,7 @@ def register_view(request):
             profile.user = user
             profile.save()
 
-            return redirect('login')
+            return redirect('accounts:profile')
         
     else:
         user_form = RegisterForm()
@@ -37,28 +37,20 @@ def profile_view(request):
 def login_view(request):
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
-
         if login_form.is_valid():
             user = login_form.get_user()
             login(request, user)
-
-            return redirect('profile')
-        
-        else:
-            return render(request, 'login.html',{
-                'login_form' : login_form,
-                'error' : "Username yoki parol noto'g'ri!!!"
-            })
-        
+            return redirect('accounts:profile')  # Bu 'accounts/urls.py' ichida bo'lishi kerak
     else:
         login_form = LoginForm()
 
-    return render(request, 'login.html',{
-        'login_form' : login_form
-    })
+    return render(request, 'login.html', {'login_form': login_form})
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('accounts:login')
+
+def home_view(request):
+    return render(request, 'home.html')
 
     

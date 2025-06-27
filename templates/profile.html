@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Sahifasi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        a.button {
+            display: block;
+            margin: 10px auto;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 6px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        a.button:hover {
+            background-color: #0056b3;
+        }
+
+        .logout {
+            margin-top: 30px;
+        }
+
+        .logout a {
+            color: red;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>👤 Xush kelibsiz, {{ request.user.username }}</h2>
+
+    <p>CRUD amallaridan birini tanlang:</p>
+
+    <a href="{% url 'maqola:create' %}" class="button">➕ Yangi maqola qo‘shish</a>
+    <a href="{% url 'maqola:list' %}" class="button">📄 Barcha maqolalarni ko‘rish</a>
+    <a href="{% url 'maqola:list' %}" class="button">✏️ Maqolani tahrirlash</a>
+    <a href="{% url 'maqola:list' %}" class="button">🗑️ Maqolani o‘chirish</a>  
+
+    <div class="logout">
+        <p><a href="{% url 'accounts:logout' %}">🚪 Chiqish (Logout)</a></p>
+    </div>
+</div>
+
+</body>
+</html>
