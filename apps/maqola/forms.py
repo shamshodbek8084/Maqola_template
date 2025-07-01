@@ -15,4 +15,3 @@ class MaqolaForm(forms.ModelForm):
         widgets = {
             'published_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
-
